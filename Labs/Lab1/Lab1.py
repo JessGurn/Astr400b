@@ -107,9 +107,41 @@ print(AgeUniverse/T_Abuter)
 # Where $G$ = 4.4985e-6 kpc$^3$/Gyr$^2$/M$_\odot$, r is in kpc and $V_{LSR}$ is in km/s
 # What about at 260 kpc (in units of  M$_\odot$) ? 
 
+print(const.G)
+Grav = const.G.to(u.kpc**3/u.Gyr**2/u.Msun)
+print(Grav)
 
+# Density profile: rho=VLSR^2/(4*pi*G*R^2)
+# Mass(r) = Integrate rho dV
+# 			Integrate rho 4*pi*r^2*dr
+#			Integrate VLSR^2/(4*pi*G*r^2) * 4*pi*r^2 dr
+#			Integrate VLSR^2/G dr
+#			VLSR^2/G*r
 
+def MassIso(r, VLSR):
+	"""
+	This function will compute the dark matter mass enclosed within a 
+	given distance, r, assuming an Isothermnal Sphere Model.
+	M(r) = VLSR^2/G*r
+	
+	Inputs: r (astropy quantity) distnace from the Galactic Center (kpc)
 
+ 			VSLR (astropy qty) the velocity at the Local Standard of Rest (km/s)
+
+ 	Outputs: M (astropy qty) mass enclosed within r (Msun)	
+	"""
+	VLSRkpcGyr = VLSR.to(u.kpc/u.Gyr) 		#translate to kpc/Gyr
+	M = VLSR**2/Grav*r 						#isothermal Sphere Mass Profile
+	return M
+
+#compute mass enclosed within Ro (Gravity Collab)
+mIsoSolar = MassIso(RoAbuter, VLSR_Abuter)
+print(mIsoSolar)
+print(f"{mIsoSolar:.2e}")
+
+#Computer mass enclosed within 260kpc
+mIso260 = massIso(260*u.kpc, VLSR_Abuter)
+print(f"{mIso260:.2e}")
 
 ##############################################################################
 # c) 
@@ -121,7 +153,31 @@ print(AgeUniverse/T_Abuter)
 # what is the minimum mass of the Milky Way (in units of M$_\odot$) ?  
 # How does this compare to estimates of the mass assuming the Isothermal Sphere model at 260 kpc (from your answer above)
 
+#potential for Hernquist Sphere
+#phi = -G*M /(r+a)
+#Escape speed becomes: 
+#vesc^2 = 2*G*M/(r+a)
+#rearrange for M
+#M = vesc^2/2/G*(r+a)
 
+def MassHernVesc(vesc, r, a=30*u.kpc):
+	"""
+ 	This function determines the total dark matter mass needed given an escape speed, assuming a Hernquist profile
+  	M = vesc^2/2/G*(r+a)
 
+	Inputs: vesc: (astropy qty) escape speed (or speed of satellite) in (km/s)
+ 			r: (astropy qty) distance from the Galactic Center (kpc)
+			a: (astropy qty) Hernquist scale length (kpc) default avlue of 30kpc
 
+   	Output: M: (astropy qty) mass within r (Msun)
+ 	"""
+	vescKpcGyr = vesc.to(u.kpc/u.Gyr)  #translate to kpc/Gyr
+	M = vescKpcGyr**2/2/Grav*(r+a)
+	
+	return M
 
+Vleo = 196*u.km/u.s	#speed of Leo I Sohn et al. 
+r = 260*u.kpc
+
+MLeoI = massHernVesc(Vleo, r)
+print(f"{MLeoI:.2e}")
