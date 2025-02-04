@@ -1,6 +1,3 @@
-
-
-
 # ASTR 400 B 
 # In Class Lab 2
 
@@ -15,29 +12,15 @@ from scipy.integrate import quad # For integration
 
 
 # ## Part A:  Schechter Fxn
-# 
 # The galaxy luminosity function in the nearby universe is well described by a Schechter Function:
-# 
-# \begin{equation}
-# \Phi(M)dM = ( 0.4 \, ln10 ) \, \phi_\ast \, 10^{0.4(M_\ast - M)(\alpha +1)} e^{-10^{0.4(M_\ast - M)}} dM
-# \end{equation}
+# Phi(M)dM = (0.4ln10)*phi*10^{0.4(Mast - M)(\alpha +1)}*e^{-10^{0.4(Mast - M)}}*dM
 # 
 # With the following parameters from Smith+(2009 MNRAS 397, 868),  for Field Galaxies in SDSS + UKIRT at z$\sim$0.1 in the Kband:
-# 
-# 
 #  $\phi_\ast$ =1.66 $  \times 10^{-2}$  $h^3$ Mpc$^{-3}$
-# 
 #  $\alpha$ =  -0.81 
-# 
-# 
-#   M$_\ast$ =  M$_k^\ast$= -23.19  - 5*log($h$)
-#   
+#  M$_\ast$ =  M$_k^\ast$= -23.19  - 5*log($h$)
 #  $h$ = the Hubble constant in units of 100 km/s/Mpc . At z=0 this is 0.7. But we are going to se $h$=1 here. Units will then be in "comoving" coordinates.
-#   
 #   This function is defined for you below:
-
-
-
 
 def schechter_M(m,phi_star=0.0166,m_star=-23.19,alpha=-0.81):
     """ Function that computes the Schechter Luminosity Function 
@@ -63,7 +46,6 @@ def schechter_M(m,phi_star=0.0166,m_star=-23.19,alpha=-0.81):
 
     """
     # You should divide up long functions instead of writing them as one long set
-    
     # Grouping all constants together
     a = 0.4*np.log(10)*phi_star
     
@@ -80,44 +62,39 @@ def schechter_M(m,phi_star=0.0166,m_star=-23.19,alpha=-0.81):
 
     return schechterM
 
-
-# # Q1 
-# 
+# ___________________________________________________________________________________________________________
+# Q1 
 # Utilizing the defined function, plot the Schechter Function using the above parameter values over a magnitude range of -17 to -26. 
-# Try to reproduce the black solid line in Smith+2009 MNRAS 397,868 [UKIDSS Survey] Figure below.
-# 
-# 
+# Try to reproduce the black solid line in Smith+2009 MNRAS 397,868 [UKIDSS Survey] Figure below. 
 # ![Smith](./Smith09.png)
 
-# # Q2 
-# 
+
+#____________________________________________________________________________________________________________
+# Q2 
 # Galaxies in the Virgo Cluster have different parameters, like $\alpha$=-1.35  (Ferrarese+2016 ApJ 824).
-# 
 # Overplot the Schechter Function with this new value of $\alpha$.  
-# 
 # Try a smaller value of $\alpha = -0.6$.
-# 
 # How does the function change?  What does this mean? 
-# 
 
 
+#__________________________________________________________________________________________________________
 
 # Create an array to store Kband Magnitudes from -26 to -17
-
-
-
+mk = np.arange(-26, -16.99, 0.1)
+print(mk)
 
 # Plot the Schechter Function
-
 fig = plt.figure(figsize=(10,10))  # sets the scale of the figure
 ax = plt.subplot(111) 
 
 # Plot the default values (y axis log)
 # ADD HERE
+ax.semilogy(mk, schechter_M(mk), color='blue', linewidth=5, label='Smith+09')
 
 # Q2 solutions: change alpha
 # ADD HERE
-
+ax.semilogy(mk, schechter_M(mk, alpha=-1.35), color='red', linewidth=5, linestyle=':', label=r'high $\alpha$')
+ax.semilogy(mk, schechter_M(mk, alpha=-0.6), color='black', linewidth=5, linestyle='--', label=r'low $\alpha$')
 
 # Add labels
 plt.xlabel(r'M$_k$ + 5Log($h$)', fontsize=22)
@@ -135,25 +112,16 @@ matplotlib.rcParams['ytick.labelsize'] = label_size
 legend = ax.legend(loc='upper right',fontsize='x-large')
 
 # Save to a file
-#plt.savefig('Schechter_M.png')
+plt.savefig('Schechter_M.png')
 
-
+#________________________________________________________________________________________
 # # Q3
-# 
 # Build a function to compute the Schechter Function in terms of luminosity.
-# 
 # Use `quad` to numerically integrate the function to compute the fraction of the luminosity that lies above L* in the following three cases:  
-# 
 # $\alpha$=-0.7 (default), $\alpha$=-0.6, $\alpha$=1.85. 
-# 
-# 
 # Schechter Function $\Phi(L) = \frac{n_\ast}{L_\ast} (\frac{L}{L_\ast})  ^{\alpha}  e^{-L/L_\ast}$
-# 
 # $n_\ast$ = 0.008  $h^3$ Mpc$^{-3}$
-# 
 # $L_\star = 1.4 \times 10^{10} L_\odot$
-
-
 
 def schechter_L(lum, n_star=8e-3, l_star=1.4e10, alpha=-0.7):
     """ Function that computes the Schechter Luminosity Function
@@ -177,21 +145,19 @@ def schechter_L(lum, n_star=8e-3, l_star=1.4e10, alpha=-0.7):
          schechterL: float
              number density of galaxies for a given luminosity 
              (h^3 * Mpc^-3/Lsun)
-    
     """
-    
     # Break down the equation into parts
+    a = n_star/l_star #constants
+
+    b = np.exp(-lum/l_star) #bright end
+
+    c = (lum/l_star)**alpha #faint end
     
-    
-    
-    
-    schechterL = 0 # Template  ADD HERE
+    schechterL = a*b*c
     
     return schechterL
 
-
-
-
+#______________________________________________________________________________________
 # Understanding lambda functions
 # Short cut -- defines and evaluates a function in one line ! 
 
@@ -199,8 +165,6 @@ def schechter_L(lum, n_star=8e-3, l_star=1.4e10, alpha=-0.7):
 # and the function to be evaluated is a*b
 x = lambda a, b : a * b
 print(x(5, 6))
-
-
 
 
 # Example Usage of quad and lambda
@@ -218,7 +182,23 @@ def ex(x):
 
 print(quad(lambda x: ex(x), 0, np.pi))
 
+#______________________________________________________________________________
+# what fraction of the integrated luminosity density lies above L*
+# alpha = -0.7
 
+# luminosity density above L*
+l_upper = quad(lambda L: L*schechter_L(L), 1.4e10, 1e14)
+print(l_upper[0])
+
+# total luminosity density
+l_total = quad(lambda L: L*schechter_L(L), 0.1, 1e14)
+print(l_total[0])
+
+#fraction on luminosity density above L*
+ratio = l_upper[0]/l_total[0]
+print("Ratio (>L*)/Ltotal", np.round(ratio, 3)) 
+
+#________________________________________________________________________________
 # ## Part B: IMF 
 # 
 # Create a function called `imf` that defines the IMF: 
