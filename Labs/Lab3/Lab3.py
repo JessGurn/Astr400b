@@ -2,6 +2,8 @@
 #In Class Lab 3 Template
 # G Besla ASTR 400B
 
+# Wasn't in class, trying myself since the recording didn't offer much info on this lab. 
+
 # Load Modules
 import numpy as np
 import astropy.units as u
@@ -37,9 +39,9 @@ import matplotlib
 # Filename for data with Isochrone fit for 1 Gyr
 # These files are located in the folder IsochroneData
 filename1="./IsochroneData/Isochrone1.txt"
-
-
-
+filename3="./IsochroneData/Isochrone3.txt"
+filename5="./IsochroneData/Isochrone5.txt"
+filename10="./IsochroneData/Isochrone10.txt"
 
 # READ IN DATA
 # "dtype=None" means line is split using white spaces
@@ -49,9 +51,9 @@ filename1="./IsochroneData/Isochrone1.txt"
 
 # Read in data for an isochrone corresponding to 1 Gyr
 data1 = np.genfromtxt(filename1,dtype=None,names=True,skip_header=8)
-
-
-
+data3 = np.genfromtxt(filename3,dtype=None,names=True,skip_header=8)
+data5 = np.genfromtxt(filename5,dtype=None,names=True,skip_header=8)
+data10 = np.genfromtxt(filename10,dtype=None,names=True,skip_header=8)
 
 # Plot Isochrones 
 # For Carina
@@ -65,7 +67,9 @@ ax = plt.subplot(111)
 # Plotting Color vs. Difference in Color 
 plt.plot(data1['B']-data1['R'], data1['R'], color='blue', linewidth=5, label='1 Gyr')
 ###EDIT Here, following the same format as the line above 
-
+plt.plot(data3['B']-data3['R'], data3['R'], color='green', linewidth=5, label='3 Gyr')
+plt.plot(data5['B']-data5['R'], data5['R'], color='red', linewidth=5, label='5 Gyr')
+plt.plot(data10['B']-data10['R'], data10['R'], color='black', linewidth=5, label='10 Gyr')
 
 
 # Add axis labels
