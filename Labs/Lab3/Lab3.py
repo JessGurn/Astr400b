@@ -38,10 +38,10 @@ import matplotlib
 
 # Filename for data with Isochrone fit for 1 Gyr
 # These files are located in the folder IsochroneData
-filename1="./IsochroneData/Isochrone1.txt"
-filename3="./IsochroneData/Isochrone3.txt"
-filename5="./IsochroneData/Isochrone5.txt"
-filename10="./IsochroneData/Isochrone10.txt"
+filename1="./Isochrone1.txt"
+filename3="./Isochrone3.txt"
+filename5="./Isochrone5.txt"
+filename10="./Isochrone10.txt"
 
 # READ IN DATA
 # "dtype=None" means line is split using white spaces
@@ -99,11 +99,23 @@ plt.savefig('IsochroneCarina.png')
 # 
 # Could there be younger ages than suggested in the Tolstoy plot?
 # Try adding younger isochrones to the above plot.
-# 
+
+'''
+If i add younger isochrone ages (0.5 Gyr) to the plot and the isochrones
+match stars in CMD that were unexplained, it could be younger star formations. 
+However if no stars align with young isochrones than Tolstoy plot is most
+likely capturing the star formations. 
+'''
+
 # # Q3
 # 
 # What do you think might cause the bursts of star formation?
-# 
+'''
+Bursts of star formations could happen because of tidal interactions from milky 
+way causing to pull/compress gas and trigger star formations. 
+Also could be supernova cycles where a supernova happens in the galaxy, 
+the gas blows out, cools, collapses, and new stars begin to form. 
+'''
 
 
 
