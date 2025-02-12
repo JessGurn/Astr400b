@@ -257,6 +257,7 @@ def imf(m, m_min=0.1, m_max=120, alpha=2.35):
     return norm_imf
     
 
+#
 
 # ## Q1: 
 # Double Check: if you integrate your function from 0.1 to 120 you should return 1.0 
@@ -281,7 +282,10 @@ def imf(m, m_min=0.1, m_max=120, alpha=2.35):
 # How might you modify the above to return the fraction of MASS in stars from 0.1Msun to 120 Msun ? instead of fraction of the total numbers of stars.
 
 
-
+#Cool. The one time the class wasnt recorded so wasnt able to finish the lab. Waited until 10pm and it didnt turn up. 
+#Its called consistency. Are lectures going to be recorded or not? If we miss a day are we going to be able to finish
+#the lab or not? If labs are due the same day as class but the recording isn't uploaded until the next day do we
+#still have the ability to do the lab for points? 
 
 
 
