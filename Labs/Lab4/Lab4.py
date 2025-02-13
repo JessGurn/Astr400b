@@ -1,5 +1,3 @@
-
-
 # In Class Lab 4
 # G. Besla 
 
@@ -27,8 +25,6 @@ from astropy import constants as const # import astropy constants
 # 
 # 
 # $\rho(r) =  \frac{M_{halo}}{2\pi} \frac{h_a}{r(r+h_a)^3} \qquad M(r) =  \frac{M_{halo} r^2}{(h_a+r)^2}$ 
-# 
-# 
 
 # ## #1
 # 
@@ -42,8 +38,8 @@ from astropy import constants as const # import astropy constants
 
 
 
-def hernquist_mass(r,h_a=60*u.kpc, m_halo=0): # ADD m_halo=??
-    """ Function that defines the Hernquist 1990 mass profile 
+def hernquist_mass(r,h_a=60*u.kpc, m_halo=1.975): # ADD m_halo=??
+    """ Function that defines the Hernquist 1990 dark matter mass profile 
     Inputs:
         r: astropy quantity
             Galactocentric distance in kpc
@@ -56,13 +52,17 @@ def hernquist_mass(r,h_a=60*u.kpc, m_halo=0): # ADD m_halo=??
         mass:  astropy quantity
             total mass within the input radius r in Msun
     """
+    a = m_halo*1e12*u.Msun #correcting unit constants
+
+    b = r**2/(h_a + r)**2
     
-    
-    
-    mass = 0 # TEMPLATE Add   
+    mass = a*b  #Hernquist profile
     
     return mass
 
+print(f"{hernquist_mass(1e5*u.kpc):.2e}")
+print(f"{hernquist_mass(260*u.kpc):.2e}")
+print(f"{hernquist_mass(50*u.kpc):.2e}")
 
 # ## #2
 # 
@@ -70,22 +70,23 @@ def hernquist_mass(r,h_a=60*u.kpc, m_halo=0): # ADD m_halo=??
 # Store this as a variable called `mass_MW50`.
 # 
 
+#Disk mass
+mdisk = 0.075e12*u.Msun
 
+#Bulge Mass
+mbulge = 0.01e12*u.Msun
 
-
+#total mass of MW within 50 kpc
+mass_MW50 = mdisk + mbulge + hernquist_mass(50*u.kpc)
+print(f"{mass_MW50:.2e}")
 
 
 # # Part B
 # 
 # The Jacobi Radius for a satellite on a circular orbit about an extended host, where 
 # the host is assumed to be well modeled as an isothermal sphere halo:
-# 
-# 
 # $R_j = r  \bigg( \frac{M_{sat}}{2 M_{host}(<r)} \bigg)^{1/3}$
-# 
-# 
 # The Isothermal Sphere approximation is not a bad one within 50 kpc.
-# 
 # Note also that the LMC is not on a circular orbit, but it is very close to its pericentric approach, where the velocity is all in the tangential component. So this isn't a terrible approximation either. 
 # 
 # ## #1
@@ -93,10 +94,10 @@ def hernquist_mass(r,h_a=60*u.kpc, m_halo=0): # ADD m_halo=??
 # such that it has a given size 
 # 
 # Do this by rearranging the Jacobi Radius equation to solve for the satellite mass. 
-# 
 
-
-
+#Rj = r*(Msat/2/Mmw)**(1/3)
+#(Rj/r)**3 = Msat/2/Mmw
+#Msat = 2*Mmw*(Rj/r)**3
 
 def jacobi_mass(rj,r,m_host):
     """ Function that determines the minimum satellite
@@ -116,20 +117,25 @@ def jacobi_mass(rj,r,m_host):
         m_min: astropy quantity
             Minimum satellite mass in Msun
     """
+    a = 2*m_host #constants
+    b = (rj/r)**3
     
-    m_min = 0 # TEMPLATE ADD HERE
+    m_min = a*b #satellite mass min
     
     return m_min
     
 
 
 # ## #2 
-# 
 # Determine the minimum total mass of the LMC needed to maintain its radius of 18.5 kpc in the face of the Milky Way's tidal 
 # field at its current distance of 50 kpc. Store this as a variable called `LMC_jacobiM`.
 
+sizeL = 18.5*u.kpc #observed size of LMC Mackey+2016
+distL = 50.0*u.kpc #Galactocentric distance to LMC
 
-
+#minimum mass of LMC needed to maintain a size of 18.5 kpc
+LMC_jacobiM = jacobi_mass(sizeL, distL, mass_MW50)
+print(f"{LMC_jacobiM:.2e}")
 
 
 
@@ -140,10 +146,13 @@ def jacobi_mass(rj,r,m_host):
 # Since we have a factor of 4 in the denominator instead of 2, the required LMC mass to maintain a radius of 18.5 kpc would be a factor of 2 larger under the point mass assumption.
 
 # ## #3
-# 
 # How does the total mass of the LMC compare to its stellar mass (M$_\ast = 3 \times 10^9$ M$_\odot$)? 
 # 
 
+LMC_mstar = 3e9*u.Msun
+print(np.round(LMC_jacobiM/LMC_mstar))
+
+#factor 17 higher than LMC, lots of dark matter
 
 
 
