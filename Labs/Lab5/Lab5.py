@@ -1,8 +1,5 @@
 
 # # Lab 5 ASTR 400B 
-# 
-
-
 
 # Import Modules 
 import numpy as np
@@ -33,9 +30,6 @@ import astropy.units as u
 # kpc^3/Gyr^2/Msun
 Grav = const.G.to(u.kpc**3/u.Gyr**2/u.Msun)
 
-
-
-
 def WolfMass(sigma, re):
     """ Function that defines the Wolf mass estimator from Wolf+ 2010
     PARAMETERS
@@ -57,11 +51,29 @@ def WolfMass(sigma, re):
     
     return mWolf
 
+#47 Tuc parameters
+lumTuc = 1e5*u.Lsun #luminosity
+sigmaTuc = 17.3*u.km/u.s #1D los vel dispersion
+reTuc = 0.5/1000*u.kpc #effective radius 2D half light
 
+#dynamical mass for 47 Tuc
+massTuc = WolfMass(sigmaTuc, reTuc)
+print(f"{massTuc:.2e}")
 
+#M/L of ~1
+print(f"Mass to Light Ratio of 47 Tuc: {np.around(massTuc/lumTuc,1)}")
 
+#Willman I Parameters
+lumWI = 1e3*u.Lsun #luminosity
+sigmaWI = 4.3*u.km/u.s #1D los vel dispersion
+reWI = 25/1000*u.kpc #effective radius
 
+#Compute dynamical mass of Willman I
+massWI = WolfMass(sigmaWI, reWI)
+print(f"{massWI:.2e}")
 
+#M/L of ~1
+print(f"Mass to Light Ratio of Willman I: {np.around(massWI/lumWI,1)}")
 
 # # Part B :  Stellar to Halo Mass Relation
 # 
@@ -170,9 +182,19 @@ class AbundanceMatching:
     
         return SHMratio 
     
- # Q1: add a function to the class that takes the SHM ratio and returns 
+# Q1: add a function to the class that takes the SHM ratio and returns 
 # The stellar mass 
+    def StellarMass(self):
+        """ 
+        Method to compute the stellar mass using eq. 2 of Moster + 2013
+        (stellar/halo mass ratio)
+        
+        OUTPUT: 
+            StarMass: float, stellar mass in Msun
+        """
+        starMass = self.mhalo*self.SHMratio()
 
+        return starMass
 
 # # Part C : Plot the Moster Relation
 # 
@@ -181,22 +203,12 @@ class AbundanceMatching:
 # 
 # ![mos](./MosterFig.png)
 
-
-
 mh = np.logspace(10,15,1000) # Logarithmically spaced array
-
-
-
 
 # Define Instances of the Class for each redshift
 MosterZ0 = AbundanceMatching(mh,0)
 
-
-
-
-
 fig,ax = plt.subplots(figsize=(10,8))
-
 
 #adjust tick label font size
 label_size = 22
@@ -220,7 +232,7 @@ plt.ylabel('log (m$_\star$/M$_\odot$)', fontsize=22)
 plt.legend(loc='lower right',fontsize='x-large')
 
 # save the file 
-plt.savefig(AbundanceMatching_Lab5.png)
+plt.savefig("AbundanceMatching_Lab5.png")
 
 
 # # Part D
