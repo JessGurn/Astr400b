@@ -39,6 +39,9 @@ class MassProfile:
         self.y = self.data['y'] * u.kpc
         self.z = self.data['z'] * u.kpc
         self.m = self.data['m']  # Mass will be converted later
+        self.vx = self.data['vx'] * (u.km/u.s)
+        self.vy = self.data['vy'] * (u.km/u.s)
+        self.vz = self.data['vz'] * (u.km/u.s)
 
     def MassEnclosed(self, ptype, radii):
         """
@@ -125,7 +128,7 @@ class MassProfile:
         
         Hmass = (Mhalo * r**2) / ((a + r)**2)
         
-        return Hmass * u.Msun
+        return Hmass
   
     def CircularVelocity(self, ptype, radii):
         """
@@ -152,6 +155,7 @@ class MassProfile:
         # Compute circular velocity
         # Vcirc = sqrt(G*M/r)
         V_circ = np.sqrt(G_converted * M_enc / radii).to(u.km/u.s) #return in units of km/s
+
         
         return np.round(V_circ, 2)  # Round to two decimal places
     
@@ -199,7 +203,7 @@ class MassProfile:
         M_enc = self.HernquistMass(r, a, Mhalo)
         
         # Vcirc = sqrt(G*M/r)
-        V_circ = np.sqrt(G_converted * M_enc / r).to(u.km/u.s)
+        V_circ = np.sqrt(G_converted * M_enc / r).to(u.km/u.s) #returns km/s
         
         return np.round(V_circ, 2)
     
@@ -240,181 +244,68 @@ class MassProfile:
         plt.legend()
         plt.grid(True)
         plt.show()
-
-# Example usage
-galaxy = 'MW'  # For Milky Way, or use 'M31' or 'M33'
-snap = 0      # Snapshot number
-mass_profile = MassProfile(galaxy, snap)
-
-# Define radii (start at 0.1 kpc, go up to 30 kpc)
-radii = np.linspace(0.1, 30, 100) * u.kpc
-
-# Call the plotting method (adjust 'a' and 'Mhalo' for Hernquist fit if needed)
-mass_profile.plot_mass_profile(radii, a_hernquist=15, Mhalo=1e12)  # Example Hernquist fit params    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-def plot_mass_profile(galaxy, snap, Mhalo, a_guess):
-    """
-    Plot the mass enclosed as a function of radius for different galaxy components.
+        
+    def plot_rotation_curve(self, galaxy, snap, Mhalo, a_guess):
+        """
+        Plot the rotation curve (circular velocity) as a function of radius for different galaxy components.
+        
+        Parameters:
+        galaxy : str
+            Name of the galaxy (MW, M31, M33)
+        snap : int
+            Snapshot number
+        Mhalo : float
+            Total halo mass in Msun
+        a_guess : float
+            Initial guess for the Hernquist scale radius (kpc)
+        """
+        
+        # Define an array of radii from 0.1 to 30 kpc (avoid starting from zero)
+        radii = np.linspace(0.1, 30, 100) * u.kpc
+        
+        # Compute circular velocities for each component
+        halo_vcirc = self.CircularVelocity(1, radii)
+        disk_vcirc = self.CircularVelocity(2, radii)
+        bulge_vcirc = self.CircularVelocity(3, radii) if self.gname != "M33" else np.zeros(len(radii)) * u.Msun
+        #bulge_vcirc = np.zeros(len(radii)) * (u.km/u.s) if galaxy == "M33" else self.CircularVelocity(3, radii)
+        bulge_vcirc = self.CircularVelocity(3, radii)
+        total_vcirc = self.CircularVelocityTotal(radii)
+        
+        # Compute the best-fit Hernquist circular velocity
+        hernquist_vcirc = self.HernquistVCirc(radii, a_guess, Mhalo)  ###
+        #hernquist_vcirc = np.sqrt(G * Mhalo * u.Msun / (radii + a_guess * u.kpc)).to(u.km/u.s)
+        
+        # Plot the rotation curves for each component
+        plt.figure(figsize=(8, 6))
+        plt.plot(radii, halo_vcirc, label="Halo", linestyle='dashed', color='blue')
+        plt.plot(radii, disk_vcirc, label="Disk", linestyle='dotted', color='red')
+        if galaxy != "M33":
+            plt.plot(radii, bulge_vcirc, label="Bulge", linestyle='dashdot', color='green')
+        plt.plot(radii, total_vcirc, label="Total", linestyle='solid', color='black')
+        plt.plot(radii, hernquist_vcirc, label=f"Hernquist (a={a_guess} kpc)", linestyle='dashed', color='purple')
+        
+        # Labels and legend
+        plt.xlabel("Radius (kpc)")
+        plt.ylabel("Circular Velocity (km/s)")
+        plt.title(f"{galaxy} Rotation Curve")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+galaxies = ['MW', 'M31', 'M33']
+
+for i in galaxies:
+    galaxy = i  # For Milky Way, or use 'M31' or 'M33'
+    snap = 0      # Snapshot number
+    mass_profile = MassProfile(galaxy, snap)
     
-    Parameters:
-    galaxy : str
-        Name of the galaxy (MW, M31, M33)
-    snap : int
-        Snapshot number
-    Mhalo : float
-        Total halo mass in Msun
-    a_guess : float
-        Initial guess for the Hernquist scale radius (kpc)
-    """
-    # Initialize the MassProfile class
-    mp = MassProfile(galaxy, snap)
+    # Define radii (start at 0.1 kpc, go up to 30 kpc)
+    radii = np.linspace(0.1, 30, 100) * u.kpc
     
-    # Define an array of radii from 0.1 to 30 kpc using 100 steps
-    radii = np.linspace(0.1, 30, 100) 
+    # Call the plotting method for mass profile. 
+    mass_profile.plot_mass_profile(radii, a_hernquist=1e7, Mhalo=1e12)  # Example Hernquist fit params    
     
-    # Compute mass profiles
-    halo_mass = mp.MassEnclosed(1, radii)
-    disk_mass = mp.MassEnclosed(2, radii)
-    bulge_mass = np.zeros(len(radii)) * u.Msun if galaxy == "M33" else mp.MassEnclosed(3, radii)
-    total_mass = mp.MassEnclosedTotal(radii)
-    
-    # Find the best-fitting Hernquist scale radius (adjust manually)
-    hernquist_mass = mp.HernquistMass(radii, a_guess, Mhalo)
-    
-    # Plot mass profiles
-    plt.figure(figsize=(8, 6))
-    plt.semilogy(radii, halo_mass, label="Halo", linestyle='dashed', color='blue')
-    plt.semilogy(radii, disk_mass, label="Disk", linestyle='dotted', color='red')
-    if galaxy != "M33":
-        plt.semilogy(radii, bulge_mass, label="Bulge", linestyle='dashdot', color='green')
-    plt.semilogy(radii, total_mass, label="Total", linestyle='solid', color='black')
-    plt.semilogy(radii, hernquist_mass, label=f"Hernquist (a={a_guess} kpc)", linestyle='dashed', color='purple')
-    
-    # Labels and legend
-    plt.xlabel("Radius (kpc)")
-    plt.ylabel("Mass Enclosed (Msun)")
-    plt.title(f"{galaxy} Mass Profile")
-    plt.legend()
-    plt.grid()
-    plt.show()
-
-plot_mass_profile(galaxy='MW', snap=0, Mhalo, a_guess=)
+    #Call the plotting method for rotation curve
+    mass_profile.plot_rotation_curve(galaxy, snap, Mhalo=1e12, a_guess=1e7)
 
 
-
-
-
-def plot_rotation_curve(galaxy, snap, Mhalo, a_guess):
-    """
-    Plot the rotation curve (circular velocity) as a function of radius for different galaxy components.
-    
-    Parameters:
-    galaxy : str
-        Name of the galaxy (MW, M31, M33)
-    snap : int
-        Snapshot number
-    Mhalo : float
-        Total halo mass in Msun
-    a_guess : float
-        Initial guess for the Hernquist scale radius (kpc)
-    """
-    # Initialize the MassProfile class
-    mp = MassProfile(galaxy, snap)
-    
-    # Define an array of radii from 0.1 to 30 kpc (avoid starting from zero)
-    radii = np.arange(0.1, 30.5, 0.5) * u.kpc
-    
-    # Compute circular velocities for each component
-    halo_vcirc = mp.CircularVelocity(1, radii)
-    disk_vcirc = mp.CircularVelocity(2, radii)
-    bulge_vcirc = np.zeros(len(radii)) * u.km/u.s if galaxy == "M33" else mp.CircularVelocity(3, radii)
-    total_vcirc = mp.CircularVelocityTotal(radii)
-    
-    # Compute the best-fit Hernquist circular velocity
-    hernquist_vcirc = mp.HernquistVCirc(radii, a_guess, Mhalo)
-    
-    # Plot the rotation curves for each component
-    plt.figure(figsize=(8, 6))
-    plt.plot(radii, halo_vcirc, label="Halo", linestyle='dashed', color='blue')
-    plt.plot(radii, disk_vcirc, label="Disk", linestyle='dotted', color='red')
-    if galaxy != "M33":
-        plt.plot(radii, bulge_vcirc, label="Bulge", linestyle='dashdot', color='green')
-    plt.plot(radii, total_vcirc, label="Total", linestyle='solid', color='black')
-    plt.plot(radii, hernquist_vcirc, label=f"Hernquist (a={a_guess} kpc)", linestyle='dashed', color='purple')
-    
-    # Labels and legend
-    plt.xlabel("Radius (kpc)")
-    plt.ylabel("Circular Velocity (km/s)")
-    plt.title(f"{galaxy} Rotation Curve")
-    plt.legend()
-    plt.grid()
-    plt.show()
-
-# Example usage:
-plot_rotation_curve("MW", 0, Mhalo=1.5e12, a_guess=20)
-plot_rotation_curve("M31", 0, Mhalo=2.5e12, a_guess=25)
-plot_rotation_curve("M33", 0, Mhalo=2.0e11, a_guess=15)
-'''
