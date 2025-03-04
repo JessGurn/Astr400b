@@ -27,15 +27,10 @@ import scipy.optimize as so
 # # Lab 7  Contour Plots and Spiral Arms
 # 
 # In this lab you will: 
-# 
 # A) Use contour plots to identify substructure within the stellar disk of M31.
-# 
 # B) Rotate the disk so that we are seeing it edge on
-# 
 # C) Create plots to examine the kinematics of the disk
-# 
 # D) Create plots to study spiral arms
-
 
 
 # Code for plotting contours
@@ -115,23 +110,14 @@ def density_contour(xdata, ydata, nbins_x, nbins_y, ax=None, **contour_kwargs):
     
     return contour
 
-
+###########################################################################################
 # Use the CenterOfMass code to compute the positions and velocities of all particles in M31's disk relative to its center of mass position and motion.
-
-
-
 # Create a COM of object for M31 Disk (particle type=2) Using Code from Homework 4
 COMD = CenterOfMass("M31_000.txt",2)
-
-
-
 
 # Compute COM of M31 using disk particles
 COMP = COMD.COM_P(0.1)
 COMV = COMD.COM_V(COMP[0],COMP[1],COMP[2])
-
-
-
 
 # Determine positions of disk particles relative to COM 
 xD = COMD.x - COMP[0].value 
@@ -153,12 +139,10 @@ vtot = np.sqrt(vxD**2 + vyD**2 + vzD**2)
 r = np.array([xD,yD,zD]).T # transposed 
 v = np.array([vxD,vyD,vzD]).T
 
-
+###########################################################################################
 # # Part A:
 # 
 # Create plot of M31's disk density, using 2D Histograms 
-
-
 
 # 1) Make plots 
 
@@ -172,7 +156,7 @@ fig, ax= plt.subplots(figsize=(12, 10))
 # https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html  
 #   e.g. 'magma', 'viridis'
 # can modify bin number to make the plot smoother
-
+plt.hist2d(xD, yD, bins=150, norm=LogNorm(), cmap='magma')
 
 cbar = plt.colorbar()
 cbar.set_label("Number of disk particle per bin", fontsize=15)
@@ -183,11 +167,9 @@ cbar.set_label("Number of disk particle per bin", fontsize=15)
 # remember to adjust this if there are other contours added
 # density_contour(pos1, pos2, res1, res2, ax=ax, colors=[])
 
-
-
 # Add axis labels
-plt.xlabel(' ', fontsize=22)
-plt.ylabel(' ', fontsize=22)
+plt.xlabel('x (kpc)', fontsize=22)
+plt.ylabel('y (kpc)', fontsize=22)
 
 #set axis limits
 plt.ylim(-40,40)
@@ -198,12 +180,10 @@ label_size = 22
 matplotlib.rcParams['xtick.labelsize'] = label_size 
 matplotlib.rcParams['ytick.labelsize'] = label_size
 
-
-
 # Save to a file
 #plt.savefig('Lab7_M31Disk.png')
 
-
+##################################################################################################
 # # Part B
 # 
 # Utilize the below code to rotate the M31 disk and plot it edge on and face on.
