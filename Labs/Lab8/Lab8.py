@@ -1,9 +1,6 @@
 
 # # Lab 8 : Star Formation 
 
-
-
-
 import numpy as np
 from astropy import units as u
 from astropy import constants as const
@@ -24,10 +21,49 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 # 
 # Kennicutt & Evans 2012 ARA&A Equation 12 and Table 1, 2
 
+def StarFormationRate(L, Type, TIR=0):
+  """
+  Function that computes the star formation rate of a galaxy following 
+  Kennicutt & Evans 2012  Eq 12 (ARA&A 50)
 
+  Parameters
+  __________
+    L: 'float'
+        luminosity of the galaxy in ergs/s
+    Type: 'string'
+        The wavelength: 'FUV', 'NUV', 'TIR', 'Halpha'
+    TIR: 'float'
+        Total infrared luminosity in erg/s (default =0)
 
+  OUTPUT
+  ________
+    SFR: 'float'
+        Log of the Star Formation Rate (Msun/yr)
+  """
+  if (Type=='FUV'):
+    logCx = 43.35 #Calibration from LFUV to SFR
+    TIRc = 0.46 #Correction for dust absorption
+  elif (Type =='NUV'):
+    logCx = 43.17
+    TIRc = 0.27
+  elif (Type=='Halpha'):
+    logCx = 41.27
+    TIRc = 0.0024
+  elif (Type == 'TIR'):
+    logCx = 43.41
+    TIRc = 0
+  else:
+    print("WARNING: Missing the Wavelength. 
+          Expecting FUV, NUV, Halpha, TIR.")
 
+  #Correct Luminosity for dust using the TIR
+  Lcorr = L + TIRc*TIR
 
+  #star formation rate
+  SFR = np.log10(Lcorr) - logCx
+
+  return SFR
+  
 
 # Let's try to reproduce SFRs derived for the WLM Dwarf Irregular Galaxy using UV luminosities measured with Galex. 
 # 
@@ -38,13 +74,20 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 # https://ned.ipac.caltech.edu/
 
 
-
 # First need the Luminosity of the Sun in the right units
-
-
-
+const.L_sun 
+LsunErgs = const.L_sun.to(u.erg/u.s).value
+print (LsunErgs)
 
 #  WLM Dwarf Irregular Galaxy
+# From Ned Galex Data
+NUV_WLM = 1.71e7*LsunErgs
+TIR_WLM = 2.48e6*LsunErgs + 3.21e5*LsunErgs + 2.49e6*LsunErgs
+#TIR = NIR + MIR + FIR
+
+#Test
+StarFormationRate(1e6*LsunErgs, 'blah')
+StarFormationRate(NUV_WLM, 'NUV', TIR_WLM)
 
 
 # # Part B Star formation main sequence
@@ -66,9 +109,26 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 
 # # Step 1
 
+def SFRMainSequence(Mstar,z):
+  """
+  Function that computes the average SFR of a galaxy
+  as a function of stellar mass and redshift.
+  PARAMETERS
+  ----------
+    Mstar: 'float'
+      Stellar mass of the galaxy in Msun
+    z: 'float'
+      Redshift
+  OUTPUT
+  ------
+    SFR:'float'
+      Log of the Star Formation Rate SFR (Msun/yr)
+  """
+  alpha = 0.7-0.13*z
+  beta = 0.38 + 1.14*z - 0.19*z**2
 
-
-
+  SFR = alpha*(np.log10(Mstar)-10.5)+beta
+  return SFR
 
 
 # # Step 2
