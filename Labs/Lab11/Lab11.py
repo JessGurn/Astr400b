@@ -91,12 +91,12 @@ class CosmologicalTools:
         
         
         # initialize the cosmology at z=0
-        self.OmegaM0 = 0    ### Matter Density Parameter
-        self.OmegaR0 = 0   ### Radiation Density Parameter
-        self.OmegaL0 = 0  ### Dark Energy Density Parameter
-        self.OmegaK0 = 0    #### Curvature Density Parameter
+        self.OmegaM0 = OmegaM0    ### Matter Density Parameter
+        self.OmegaR0 = OmegaR0   ### Radiation Density Parameter
+        self.OmegaL0 = OmegaL0  ### Dark Energy Density Parameter
+        self.OmegaK0 = 1 - (OmegaM0 + OmegaR0 + OmegaL0)    #### Curvature Density Parameter
     
-        self.h = 0    # Normalization of Hubble Parameter   
+        self.h = h    # Normalization of Hubble Parameter   
         self.Ho = self.h*100*u.km/u.s/u.Mpc #  Hubble Constant at z=0  100 h km/s/Mpc
     
     
@@ -117,8 +117,13 @@ class CosmologicalTools:
         """
         
         
-        # FILL THIS IN 
-        Hz = 0
+        # FILL THIS IN
+        OmegaM = self.OmegaM0*(1+z)**3
+        OmegaR = self.OmegaR0*(1+z)**4   #radiation
+        OmegaL = self.OmegaL0  #Dark Energy
+        OmegaK = self.OmegaK0*(1+z)**2  #Curvature
+        
+        Hz = self.H0*np.sqrt(OmegaM + OmegaR + OmegaL + OmegaK)
 
         return Hz  
     
@@ -199,6 +204,7 @@ OmegaR0_planck = 8.24e-5  # Radiation Density Parameter
 OmegaL0_planck = 0.692  # Dark Energy Density Parameter
 h_planck = 0.6781   # Hubble Constant  100 h km/s/Mpc
   
+BenchMark = CosmologicalTools(OmegaM0_planck, OmegaR0_planck, OmegaL0_planck, h_planck)
 
 
 
@@ -212,14 +218,14 @@ h_planck = 0.6781   # Hubble Constant  100 h km/s/Mpc
 # Question 1 B) 
 
 # Test Hubble Parameter at z = 0
-
+BenchMark.HubbleParameter(0)
 
 
 
 # Question 1 C) 
 
 # Compute the Hubble Parameter at z = 1 in BenchMark Cosmology
-
+BenchMark.HubbleParameter(1)
 
 
 
