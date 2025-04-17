@@ -22,7 +22,7 @@ import matplotlib
 #################
 # Lab 12 : 
 # tool for numerical integration from SciPy  
-from scipy.integrate import simps
+from scipy.integrate import simpsun
 
 #Import the constant for the speed of light
 from astropy.constants import c
@@ -319,12 +319,15 @@ class CosmologicalTools:
         # y = (1/H(zrange)).to(GYR)  /  (1+zrange)
         # But need to correct units of 1/H to be Gyr rather than seconds  
         # use the astropy.units functionality .to(units)
-        # FILL THIS IN 
+        # FILL THIS IN
+
+        y = (1.0/self.HubbleParameter(zrange)).to*(u.Gyr)/(1+zrange)
+
         
         
         # Integrate y numerically over zrange and return in units of Gyr
         # FILL THIS IN 
-        LBtime = 0
+        LBtime = simps(y, zrange)*u.Gyr
         
         return LBtime
     
@@ -483,10 +486,8 @@ class CosmologicalTools:
     
 
     
-    
+    #######################################################################################################################
 
-
-# In[ ]:
 
 
 # Define the benchmark cosmology at z =0
@@ -499,10 +500,6 @@ OmegaL0_planck = 0.692  # Dark Energy Density Parameter
 h_planck = 0.6781   # Hubble Constant  100 h km/s/Mpc
    
 
-
-# In[ ]:
-
-
 # Define the Einstein-DeSitter cosmology (Matter Dominated)
 OmegaMD = 1
 OmegaRD = 0
@@ -510,48 +507,28 @@ OmegaLD = 0
 # h is the same = h_planck
 
 
-# In[ ]:
-
-
 # Define here an instance of the Class Cosmological Tools that follows the Benchmark Cosmology
-
-
-# In[ ]:
-
+# Tools that follow Benchmark Cosmology
+BenchMark = CosmologicalTools(OmegaM0_planck, OmegaR0_planck, OmegaL0_planck, h_planck)
 
 # Define a New Instance of the Class with Einstein De Sitter Cosmology 
-
-
+# Desitter Cosmology
+DeSitter = CosmologicalTools(OmegaMD, OmegaRD, OmegaLD, h_planck)
+#######################################################################################################
 # ##  Question 1 B) 
 
-# In[ ]:
-
-
-# Question 1 B) 
-
 # How many Gyr ago was z=1 in the Benchmark cosmology?
-
-
-# In[ ]:
-
-
-# Question 1 B) 
+BenchMark.LookBackTime(1)
 
 # What is the Age of the Universe in the Benchmark Cosmology  (put in a large z)
-
-
-# In[ ]:
-
+BenchMark.LookBackTime(1000)
 
 # What is the Age of the Universe in the Einstein De Sitter Cosmology
-
-
-# In[ ]:
-
+DeSitter.LookBackTime(1000)
 
 # Which is younger?
 
-
+#######################################################################################################
 # ## Question 1 C) 
 # 
 # 
@@ -566,9 +543,6 @@ OmegaLD = 0
 #     
 # $\indent$$\indent$``        expression``
 
-# In[ ]:
-
-
 # Question 1 C)   Plotting Look Back Time
 
 # First define an array of redshift for the X axis
@@ -577,38 +551,24 @@ zmax = 50
 zmin = 0.001
 zrange = np.arange(zmin, zmax, 0.01)
 
-
-# In[ ]:
-
-
 # Create a list comprehension to compute an array of Look Back Time for each element in zrange
 # NOTE THIS GENERATES A LIST NOT AN ARRAY
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
+TimeBenchMark = [BenchMark.LookBackTime(i).value for i in zrange]
+TimeDeSitter = [DeSitter.LookBackTime(i).value for i in zrange]
 
 # Plot the Look Back Time as a Function of Redshift out to z=10
-################################################################
+#######################################################################################################################
 
 fig = plt.figure(figsize=(10,10))
 ax = plt.subplot(111)
-
-
 # Look Back Time Benchmark
 # FILL THIS IN
-#plt.semilogx(### , ###  color='blue', linewidth=5, label='Benchmark')
+plt.semilogx(1+zrange , TimeBenchMark, color='blue', linewidth=5, label='Benchmark')
 
 
 # Look Back Time Einstein De Sitter
 # FILL THIS IN
-#plt.semilogx(### ,  ####, color='red', linewidth=5, label='DeSitter')
+plt.semilogx(1+zrange, TimeDeSitter, color='red', linewidth=5, label='DeSitter')
 
 
 # Add axis labels
