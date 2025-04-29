@@ -423,10 +423,11 @@ class CosmologicalTools:
         """
   
         # Temperature of the universe today 
+        T0 = 2.73*u.K
         
         # Fill this in 
-        
-        return 
+        T = T0*(1+z)
+        return T
 
     
     # Part 3: Question 1
@@ -453,19 +454,11 @@ class CosmologicalTools:
         
         """
       
-        # Fill this in
-    
+        SH = self.ProperDistance(ze, zlarge)/np.sqrt(3)    
         
-        return 
+        return SH 
     
     
-    
-    
-    
-    
-    
-
-
 
 
 # Define the benchmark cosmology at z =0
@@ -477,37 +470,40 @@ OmegaR0_planck = 8.24e-5  # Radiation Density Parameter
 OmegaL0_planck = 0.692  # Dark Energy Density Parameter
 h_planck = 0.6781   # Hubble Constant  100 h km/s/Mpc
   
-
-
-
-
 # Define here an instance of the Class Cosmological Tools that follows the Benchmark Cosmology
+BenchMark = CosmologicalTools(OmegaM0_planck, OmegaR0_planck, OmegaL0_planck, h_planck)
 
+#Einstein-DeSitter
+OmegaMD = 1
+OmegaRD = 0
+OmegaLD = 0
+EDeSitter = CosmologicalTools(OmegaMD_planck, OmegaRD_planck, OmegaLD_planck, h_planck)
 
 # # Part 1, Question 2
 # 
 
-
-
 # Define k_B in EV/K 
+print(k_B) #Unit J/K
 
-
-
+#Boltzmann constant in eV/K
+k_B_eV = k_B.to(u.electronvolt/u.K)
+print(k_B_eV)  #unit eV/K
 
 #  What is the temperature needed to ionize a hydrogen atom (13.6eV)?
+# E = 3kBT --> T = E/3/kB
 
-
-
+T_Hydrogen = 13.6*u.eV/3/k_B_eV
 
 # How does this temperature compare to the temperature at the redshift of Recombination (Z = 1100)? 
 
+z_recombine = 1100
 
-
+T_recombine = BenchMark.Temperature(z_recombine)
+print(T_recombine) #~3000 K needs to be 52000 K
 
 # At what redshift is the temperature sufficient to ionize hydrogen?
-
-
-
+z_guess = 20000
+print(BenchMark.Temperature(z_guess))
 
 # So why doesn't recombination occur then? - see lecture 
 
@@ -531,13 +527,12 @@ ax = plt.subplot(111)
 
 # Temperature
 # FILL THIS IN
-#plt.semilogy(##, ##, linewidth=5, label='BenchMark')
-
+plt.semilogy(zrange + 1, BenchMark.Temperature(zrange), linewidth=5, label='BenchMark')
+plt.semilogy(zrange + 1, EDeSitter.Temperature(zrange), linewidth=5, label='EDeSitter')
 
 # Add axis labels
 plt.xlabel('1+z', fontsize=22)
 plt.ylabel('Temperature (K)', fontsize=22)
-
 
 
 #adjust tick label font size
@@ -554,29 +549,46 @@ plt.savefig('Lab12_Temperature.png')
 # # Part 2, Question 1
 
 # What is the size of the universe at the epoch of recombination in the BenchMark Cosmology?
+HorizonRecombine = BenchMark.ProperDistance(z_recombine, 20000)
+print(HorizonRecombine)
 
-# What is the sound horizon TODAY in the BenchMark Cosmology?
+#What angle does the casually connected region of the 
+# universe at z=1100 subtend on the sky today? 
 
-# What is the sound horizon at the epoch of recombination in the Einstein DeSitter Cosmology?
+#S = DA*theta
+#Theta = S/DA
+# S = 2*HorizonRecombine
 
-# What is the sound horizon TODAY in the Einstein DeSitter Cosmology?
+Theta = 2*HorizonRecombine/BenchMark.AngularDiameterDistance(z_recombine)
+print(Theta*u.radian.to(u.degree))
 
-# What angle does the causally connected region of the universe at z=1100 subtend on the sky today?
-
+1/(70*u.km/u.s/u.Mpc).to(1/u.Gyr)
+#1/hubble parameter is the age of the universe
 
 
 
 # # Part 3, Question 2
 
+# What is the sound horizon at the epoch of recombination in Benchmark Cosmology? 
+SoundHorizon = BenchMark.SoundHorizon(z_recombine, 20000)
+print(SoundHorizon)
 
+# What is the sound horizon TODAY in the BenchMark Cosmology?
+# Proper Distance = Comoving Radial Distance / (1+z)
+SoundHorizonToday = SoundHorizon*(1+z_recombine)
+print(SoundHorizonToday)
 
-# What is the size of sound horizon at the epoch of recombination ? 
+# What is the sound horizon at the epoch of recombination in the Einstein DeSitter Cosmology?
+SoundHorizonED = EDeSitter.SoundHorizon(z_recombine, 20000)
+print(SoundHorizonED)
+
+# What is the sound horizon TODAY in the Einstein DeSitter Cosmology?
+SoundHorizonTodayED = SoundHorizonED*(1+z_recombine)
+print(SoundHorizonTodayED)
+
 
 
 # ## Part 3, Question 3 
-# 
-
-
-
 # What is the angular size subtended by the Sound Horizon Diameter?
-
+ThetaSound = 2*SoundHorizon/BenchMark.AngularDiameterDistance(z_recombine)
+print(ThetaSound*u.radian.to(u.degree))
