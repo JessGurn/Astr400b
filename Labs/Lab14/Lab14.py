@@ -163,9 +163,9 @@ legend = ax.legend(loc='upper left',fontsize=18)
 
 
 
-
 #2) Velocity
 # Determine the recessional speed based on the redshift
+
 
 
 # # Part C
@@ -239,25 +239,42 @@ legend = ax.legend(loc='upper left',fontsize=18)
 
 
 # define an array of redshifts to compute the luminosity distance
-
+zarray = np.linspace(0.01, 1.1*max(data['z']), 100)
 
 
 
 # Compute the corresponding recessional velocities using the doppler shift
 # z = v/c
-
+vrec = zarray*c.to(u.km/u.s)
 
 
 
 # Generate models for the luminosity distance as a function of z 
 # for Benchmark and Einstein De Sitter Cosmologies. 
 # Use a list comprehension
-
-
+modelLD_BenchMark = [BenchMark.LuminosityDistance(i).value for i in zarray]
+modelLD_EinsteinDeSitter = [EinsteinDeSitter.LuminosityDistance(i).value for i in zarray]
 
 
 # Plot the new models on top of the data
+fig = plt.figure(figsize=(10,5))
+ax = plt.subplot(111)
 
+# plot nearby SNe
+ax.plot(RV,LD, 'b.', label='SNe data')
+
+#Add model
+ax.plot(VR, modelLD, 'r', label='VR/Ho')
+
+ax.plot(vrec, modelLD_BenchMark, 'orange', linestyle='--', lw=5, label='BenchMark')
+ax.plot(vrec, modelLD_EinsteinDeSitter, 'green', linestyle='.', lw=5, label='DeSitter')
+
+ax.set_xlabel('Recessional velocity [km/s]', fontsize=18)
+ax.set_ylabel('Luminosity Distance [Mpc]', fontsize=18)
+ax.set_title(f"Luminosity Distance vs Recessional Velocity for all SNe in Suzuki 2012",
+             fontsize=15)
+
+legend = ax.legend(loc='upper left',fontsize=18)
 
 
 # To determine the best fit, you would test different values of Omega_M and Omega_L and generate probability contours
